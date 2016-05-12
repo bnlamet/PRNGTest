@@ -153,11 +153,11 @@ Usage:\n\
 	\n\
 	Enter 't':\n\
 	get a table of generation time of fix number\n\
-	Ex: ./rng t
+	Ex: ./rng t\n\
 	\n\
 	Enter 'ta' [postive number y]:\n\
 	to get a table of average generation time of fix numbers ran y time\n\
-	Ex: ./rng ta 100
+	Ex: ./rng ta 100\n\
 	\n\
 	Enter 'a' [postive number x] [postive number y]:\n\
 	to get the average generation time of x number ran y time\n\
