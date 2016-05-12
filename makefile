@@ -1,3 +1,3 @@
-all:
-	gcc rng.c -o rng
+All:
+	gcc rng.c twister.c -o rng
 
