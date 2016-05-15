@@ -33,10 +33,10 @@ genSingleAveTime(): A mode that calcutate the average time spent to generate x t
 genTableAveTime(): A mode that does samething as 2 but calculate in x run and calculate average time
 */
 
-clock_t getRnGenTime(long long RNamount);
+long getRnGenTime(long RNamount);
 void genTableTime();
-void genTableAveTime(long long timeToGen);
-void genSingleAveTime(long long amount, long long timeToGen);
+void genTableAveTime(long timeToGen);
+void genSingleAveTime(long amount, long timeToGen);
 void printHelp();
 
 // usage: ./rng [argument]
@@ -44,9 +44,9 @@ void printHelp();
 int main(int argc, char *argv[])
 {
 
-	long long amount;
-	long long timeToGen;	
-	double time;
+	long amount;
+	long timeToGen;	
+	long time;
 
 	if(argc < 2 || argc > 4)
 	{
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
 	}
 	else if(argc == 2)
 	{
-		time = (double)(getRnGenTime(amount));
-		printf("\nTime spent to generate %lld random number: %f clock tick(s)\n", amount, time);
+		time = getRnGenTime(amount);
+		printf("\nTime spent to generate %ld random number: %ld nanosecond(s)\n", amount, time);
 	}
 	else
 	{
@@ -83,64 +83,69 @@ int main(int argc, char *argv[])
 
 void genTableTime()
 {
-	long long amount[] = {1000,10000,100000,1000000};
-	double time[4];
+	long amount[] = {1000,10000,100000,1000000};
+	long time[4];
 	int i;
 
 	for(i = 0; i < 4; i++)
 	{
-		time[i] = (double)(getRnGenTime(amount[i]));
-		printf("%lld number:\t%f\tclock ticks\n",amount[i],time[i]);
+		time[i] = getRnGenTime(amount[i]);
+		printf("%ld number:\t%ld\tnanoseconds\n",amount[i],time[i]);
 	}
 }
 
-void genTableAveTime(long long timeToGen)
+void genTableAveTime(long timeToGen)
 {
-	double avetime[4];
-	long long amount[] = {1000,10000,100000,1000000};
-	long long i;
-	long long k;
+	long long avetime[] = {0,0,0,0};
+	long amount[] = {1000,10000,100000,1000000};
+	long i;
+	int k;
 	
-	printf("Average clock ticks when generate %lld time:\n",timeToGen);
+	printf("Average nanoseconds when generate %ld time:\n",timeToGen);
 	for(k = 0; k < 4 ;k++)
 	{
 		for(i = 0; i < timeToGen; i++)
-			avetime[k] = avetime[k] + (double)(getRnGenTime(amount[k]));
+			avetime[k] = avetime[k] + (long long)(getRnGenTime(amount[k]));
 
-		avetime[k] = avetime[k] / (double)(timeToGen);
-		printf("%lld number:\t%f\t clock ticks\n",amount[k],avetime[k]);
+		avetime[k] = avetime[k] / (long long)(timeToGen);
+		printf("%ld number:\t%lld\t nanosocnds\n",amount[k],avetime[k]);
 	}
 }
 
-void genSingleAveTime(long long amount, long long timeToGen)
+void genSingleAveTime(long amount, long timeToGen)
 {
-	double avetime;
-	int i;
+	long long avetime = 0;
+	long i;
 
-		for(i = 0; i < timeToGen; i++)
-			avetime = avetime + (double)(getRnGenTime(amount));
+	for(i = 0; i < timeToGen; i++)
+		avetime = avetime + (long long)(getRnGenTime(amount));
 
-                avetime = avetime / (double)(timeToGen);
-                printf("\nAverage Time spent to generate %lld random number for %lld time: %f clock tick(s)\n",amount,timeToGen,avetime);
+	avetime = avetime / (long long)(timeToGen);
+
+
+	printf("\nAverage Time spent to generate %ld random number for %ld time: %lld nanosecond(s)\n",amount,timeToGen,avetime);
 }
 
 
-// this function calculate time spent to generate RNamount of random number
-clock_t getRnGenTime (long long RNamount)
+// this function calculate time spent to generate RNamount of random number in nanosecond
+long getRnGenTime (long RNamount)
 {
-	clock_t start, end;
-	long long i;
+	struct timespec start;
+	struct timespec end;
+	clockid_t clockID = CLOCK_MONOTONIC;
+
+	long i;
 
 	seedMT(0);
-	start = clock();
+	clock_gettime(clockID, &start);
 	for(i = 0; i < RNamount; i++)
 	{
 //		printf("\t%lu%s", (unsigned long) randomMT()%100, (i%7)==6 ? "\n" : "");
 		randomMT();
 	}
-	end = clock();
+	clock_gettime(clockID, &end);
 
-	return (end - start); 
+	return (end.tv_nsec - start.tv_nsec); 
 }
 
 void printHelp()
@@ -163,5 +168,4 @@ Usage:\n\
 	to get the average generation time of x number ran y time\n\
 	Ex: ./rng a 10000 100\n\
 ");
-
 }
